@@ -1,0 +1,14 @@
+{
+	"title" :	"Bored HUD",
+	"type"  :	"effects",
+	"tags"  :	[],
+	"ignore":
+	[
+		"*.cmd",
+		"*.ini",
+		"*.lnk",
+		"*.url",
+		"bored-hud.jpg",
+		"bored-hud.png"
+	]
+}
