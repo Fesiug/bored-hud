@@ -590,8 +590,8 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 			local FUCKYOU = surface.GetTextSize(hi.hp_am-s2remove)/2
 			surface.SetFont("BoHU_10")
 			surface.SetTextColor(BoHU_ColorWhite)
-			BoHU.Text( s2extra, {0, 0}, hi.scrw_g + sm((28)+1) + FUCKYOU, hi.scrh_g + hi.scrh - sm(29) )
-			BoHU.Text( "+", {0, 0},     hi.scrw_g + sm((28)+1) + FUCKYOU, hi.scrh_g + hi.scrh - sm(34) )
+			BoHU.Text( s2extra, {0, 0}, hi.scrw_g + sm(28+1) + FUCKYOU, hi.scrh_g + hi.scrh - sm(29) )
+			BoHU.Text( "+", {0, 0},     hi.scrw_g + sm(28+1) + FUCKYOU, hi.scrh_g + hi.scrh - sm(34) )
 		end
 		surface.SetTextColor(BoHU_ColorWhite)
 		surface.SetFont("BoHU_26")
@@ -633,8 +633,8 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 			local FUCKYOU = surface.GetTextSize(hi.ar_am-s2remove)/2
 			surface.SetFont("BoHU_8")
 			surface.SetTextColor(BoHU_ColorWhite)
-			BoHU.Text( s2extra, {0, 0}, hi.scrw_g + sm(28) + as + FUCKYOU, hi.scrh_g + hi.scrh - sm(28) )
-			BoHU.Text( "+", {0, 0},     hi.scrw_g + sm(28) + as + FUCKYOU, hi.scrh_g + hi.scrh - sm(32) )
+			BoHU.Text( s2extra, {0, 0}, hi.scrw_g + sm(28) + as + FUCKYOU, hi.scrh_g + hi.scrh - sm(29) )
+			BoHU.Text( "+", {0, 0},     hi.scrw_g + sm(28) + as + FUCKYOU, hi.scrh_g + hi.scrh - sm(34) )
 		end
 		surface.SetTextColor(BoHU_ColorWhite)
 		surface.SetFont("BoHU_20")
