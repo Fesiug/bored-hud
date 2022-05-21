@@ -8,7 +8,13 @@
 		"*.ini",
 		"*.lnk",
 		"*.url",
+        	".git/*",
+       	 	".gitignore",
+        	".gitattributes",
+        	"*.code-workspace",
 		"bored-hud.jpg",
-		"bored-hud.png"
+		"bored-hud.png",
+        	"LICENSE",
+        	"README.md"
 	]
 }
