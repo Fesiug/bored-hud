@@ -10,6 +10,7 @@ CreateClientConVar("boredhud_scale",		1, true, false, "HUD scale")
 CreateClientConVar("boredhud_deadx",		1, true, false, "Deadzone x")
 CreateClientConVar("boredhud_deady",		1, true, false, "Deadzone y")
 CreateClientConVar("boredhud_font",			"", true, false, "HUD font")
+CreateClientConVar("boredhud_font_scanlines",	0, true, false, "HUD font scanlines")
 CreateClientConVar("boredhud_font_weight",	0, true, false, "HUD font weight")
 
 CreateClientConVar("boredhud_jmod",	1, 			true, false, "Show JMOD equipment")
@@ -42,6 +43,7 @@ concommand.Add("boredhud_reset", function()
 	GetConVar("boredhud_deady"):Revert()
 
 	GetConVar("boredhud_font"):Revert()
+	GetConVar("boredhud_font_scanlines"):Revert()
 	GetConVar("boredhud_font_weight"):Revert()
 
 	GetConVar("boredhud_jmod"):Revert()
@@ -94,6 +96,7 @@ local function generatefonts()
 			font = GetFont(),
 			size = ScreenScale(i) * GetConVar("boredhud_scale"):GetFloat() * 0.8,  -- fuck i made this at 80% scale in arccw
 			weight = GetConVar("boredhud_font_weight"):GetFloat(),
+			scanlines = GetConVar("boredhud_font_scanlines"):GetFloat() * GetConVar("boredhud_scale"):GetFloat(),
 			antialias = true,
 		} )
 	end
@@ -104,6 +107,9 @@ cvars.AddChangeCallback("boredhud_scale", function()
 	generatefonts()
 end)
 cvars.AddChangeCallback("boredhud_font", function()
+	generatefonts()
+end)
+cvars.AddChangeCallback("boredhud_font_scanlines", function()
 	generatefonts()
 end)
 cvars.AddChangeCallback("boredhud_font_weight", function()
@@ -122,6 +128,7 @@ local bohuPanel = {
 	{ type = "f", text = "Deadzone X", var = "boredhud_deadx", min = 0.5, max = 1 },
 	{ type = "f", text = "Deadzone Y", var = "boredhud_deady", min = 0.5, max = 1 },
 	{ type = "t", text = "HUD Font", var = "boredhud_font"  },
+	{ type = "i", text = "HUD Font Scanlines", var = "boredhud_font_scanlines", min = 0, max = 5 },
 	{ type = "i", text = "HUD Font Weight", var = "boredhud_font_weight", min = 0, max = 1000 },
 	{ type = "b", text = "Show JMod Equipment", var = "boredhud_jmod", },
 	{ type = "f", text = "JMod Armor Intensity", var = "boredhud_jmod_intensity", min = 0, max = 1 },
