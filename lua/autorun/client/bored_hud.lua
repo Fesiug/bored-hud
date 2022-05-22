@@ -935,7 +935,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 
 			BoHU.ProgressBar(HOLYSHIT, 1, hi.scrw_g + hi.scrw - sm(64+16), hi.scrh_g + sm(13+7), sm(64), sm(2))
 
-			if hi.pw.ArcCW then
+			if false then--hi.pw.ArcCW then
 					BoHU.Text("Speed", {1, 1}, hi.scrw_g + hi.scrw - sm(16), hi.scrh_g + sm(13+6+64))
 				BoHU.Text(math.Round(hi.pw:GetBuff("SpeedMult")*100) .. "%", {1, 1}, hi.scrw_g + hi.scrw - sm(48 + 16 + 2), hi.scrh_g + sm(11+64) + sm(13))
 				BoHU.ProgressBar(hi.pw:GetBuff("SpeedMult"), 1, hi.scrw_g + hi.scrw - sm(48+16), hi.scrh_g + sm(13+7+64), sm(48), sm(2))
