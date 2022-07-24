@@ -5,17 +5,19 @@ CreateClientConVar("boredhud_enable_ammo",			1, true, false, "Draw HUD ammo")
 CreateClientConVar("boredhud_enable_suit",			1, true, false, "Draw HUD suit functions")
 CreateClientConVar("boredhud_enable_rangefinder",	0, true, false, "Draw HUD rangefinder?")
 CreateClientConVar("boredhud_enable_squads",		0, true, false, "Draw HUD citizen squads?")
+CreateClientConVar("boredhud_enable_ammo_trivia",	0, true, false, "Use ArcCW ammo trivia for the ammotype?")
 
-CreateClientConVar("boredhud_scale",		1, true, false, "HUD scale")
-CreateClientConVar("boredhud_deadx",		1, true, false, "Deadzone x")
-CreateClientConVar("boredhud_deady",		1, true, false, "Deadzone y")
-CreateClientConVar("boredhud_font",			"", true, false, "HUD font")
+CreateClientConVar("boredhud_scale",			1, true, false, "HUD scale")
+CreateClientConVar("boredhud_deadx",			1, true, false, "Deadzone x")
+CreateClientConVar("boredhud_deady",			1, true, false, "Deadzone y")
+CreateClientConVar("boredhud_font",				"", true, false, "HUD font")
 CreateClientConVar("boredhud_font_scanlines",	0, true, false, "HUD font scanlines")
-CreateClientConVar("boredhud_font_weight",	0, true, false, "HUD font weight")
+CreateClientConVar("boredhud_font_weight",		0, true, false, "HUD font weight")
 
-CreateClientConVar("boredhud_jmod",	1, 			true, false, "Show JMOD equipment")
-CreateClientConVar("boredhud_jmod_intensity",	0.8, true, false, "JMOD armor intensity")
-CreateClientConVar("boredhud_jmod_scale",	1, true, false, "JMOD armor scale")
+-- not reinstalling jmod to debug it abdumiliah
+-- CreateClientConVar("boredhud_jmod",				1, true, false, "Show JMOD equipment")
+-- CreateClientConVar("boredhud_jmod_intensity",	0.8, true, false, "JMOD armor intensity")
+-- CreateClientConVar("boredhud_jmod_scale",		1, true, false, "JMOD armor scale")
 
 CreateClientConVar("boredhud_main_r",	"255", true, false, "Main color, Red",		0, 255)
 CreateClientConVar("boredhud_main_g",	"255", true, false, "Main color, Green",	0, 255)
@@ -37,6 +39,7 @@ concommand.Add("boredhud_reset", function()
 	GetConVar("boredhud_enable_suit"):Revert()
 	GetConVar("boredhud_enable_rangefinder"):Revert()
 	GetConVar("boredhud_enable_squads"):Revert()
+	GetConVar("boredhud_enable_ammo_trivia"):Revert()
 
 	GetConVar("boredhud_scale"):Revert()
 	GetConVar("boredhud_deadx"):Revert()
@@ -46,9 +49,9 @@ concommand.Add("boredhud_reset", function()
 	GetConVar("boredhud_font_scanlines"):Revert()
 	GetConVar("boredhud_font_weight"):Revert()
 
-	GetConVar("boredhud_jmod"):Revert()
-	GetConVar("boredhud_jmod_intensity"):Revert()
-	GetConVar("boredhud_jmod_scale"):Revert()
+	-- GetConVar("boredhud_jmod"):Revert()
+	-- GetConVar("boredhud_jmod_intensity"):Revert()
+	-- GetConVar("boredhud_jmod_scale"):Revert()
 
 	GetConVar("boredhud_main_r"):Revert()
 	GetConVar("boredhud_main_g"):Revert()
@@ -64,9 +67,9 @@ end, nil, "Reset all Bored HUD options to pure default.")
 local function sm(v)
 	return v * ( ScrW() / 640.0 ) * GetConVar("boredhud_scale"):GetFloat()
 end
-local function sm_j(v)
-	return v * ( ScrW() / 640.0 ) * GetConVar("boredhud_scale"):GetFloat() * GetConVar("boredhud_jmod_scale"):GetFloat()
-end
+-- local function sm_j(v)
+-- 	return v * ( ScrW() / 640.0 ) * GetConVar("boredhud_scale"):GetFloat() * GetConVar("boredhud_jmod_scale"):GetFloat()
+-- end
 
 -- stolen from arccw
 local sizes_to_make = {
@@ -124,15 +127,16 @@ local bohuPanel = {
 	{ type = "b", text = "Suit", var = "boredhud_enable_suit", },
 	{ type = "b", text = "Rangefinder", var = "boredhud_enable_rangefinder", },
 	{ type = "b", text = "HL2 Squads", var = "boredhud_enable_squads", },
+	{ type = "b", text = "Use Trivia for Ammotype (for Tasky)", var = "boredhud_enable_ammo_trivia", },
 	{ type = "f", text = "HUD Scale", var = "boredhud_scale", min = 0.5, max = 2.5 },
 	{ type = "f", text = "Deadzone X", var = "boredhud_deadx", min = 0.5, max = 1 },
 	{ type = "f", text = "Deadzone Y", var = "boredhud_deady", min = 0.5, max = 1 },
 	{ type = "t", text = "HUD Font", var = "boredhud_font"  },
 	{ type = "i", text = "HUD Font Scanlines", var = "boredhud_font_scanlines", min = 0, max = 5 },
 	{ type = "i", text = "HUD Font Weight", var = "boredhud_font_weight", min = 0, max = 1000 },
-	{ type = "b", text = "Show JMod Equipment", var = "boredhud_jmod", },
-	{ type = "f", text = "JMod Armor Intensity", var = "boredhud_jmod_intensity", min = 0, max = 1 },
-	{ type = "f", text = "JMod Armor Scale", var = "boredhud_jmod_scale", min = 1, max = 2 },
+	-- { type = "b", text = "Show JMod Equipment", var = "boredhud_jmod", },
+	-- { type = "f", text = "JMod Armor Intensity", var = "boredhud_jmod_intensity", min = 0, max = 1 },
+	-- { type = "f", text = "JMod Armor Scale", var = "boredhud_jmod_scale", min = 1, max = 2 },
 
 	{ type = "m", text = "Main HUD Color", r = "boredhud_main_r", g = "boredhud_main_g", b = "boredhud_main_b", a = "boredhud_main_a"},
 	{ type = "m", text = "Shadow HUD Color", r = "boredhud_shadow_r", g = "boredhud_shadow_g", b = "boredhud_shadow_b", a = "boredhud_shadow_a"},
@@ -337,7 +341,7 @@ function BoHU.GetHUDInfo()
 
 		if ammotype > -1 then
 			info.wp_ammo1 = P:GetAmmoCount(ammotype) or 0
-			info.wp_ammoname = game.GetAmmoName(ammotype) or ""
+			info.wp_ammoname = language.GetPhrase((game.GetAmmoName(ammotype) or "") .. "_ammo")
 		end
 		if ammotyp2 > -1 then
 			info.wp_ammo2 = P:GetAmmoCount(ammotyp2) or 0
@@ -357,7 +361,8 @@ function BoHU.GetHUDInfo()
 			info.wp_ammo1		= HD.ammo
 			info.wp_maxclip1	= PW:GetCapacity()
 			info.wp_clipextra1	= HD.plus
-			info.wp_clip2       = HD.ubgl
+			info.wp_clip2		= HD.ubgl
+			if GetConVar("boredhud_enable_ammo_trivia"):GetBool() and (PW:GetBuff_Override("Override_Trivia_Calibre") or PW.Trivia_Calibre) then info.wp_ammoname = (PW:GetBuff_Override("Override_Trivia_Calibre") or PW.Trivia_Calibre) end
 			if PW:GetInUBGL() then
 				info.wp_ammoname = game.GetAmmoName(ammotyp2) or ""
 			end
@@ -460,16 +465,16 @@ function BoHU.GetHUDInfo()
 	return info
 end
 
-local function BoHU_JMOD_GetItemInSlot( armorTable, slot )
-	if !( armorTable and armorTable.items )then return nil end
-	for id, armorData in pairs( armorTable.items )do
-		local ArmorInfo = JMod.ArmorTable[armorData.name]
-		if ( ArmorInfo.slots[slot] )then
-			return id, armorData, ArmorInfo
-		end
-	end
-	return nil
-end
+-- local function BoHU_JMOD_GetItemInSlot( armorTable, slot )
+-- 	if !( armorTable and armorTable.items )then return nil end
+-- 	for id, armorData in pairs( armorTable.items )do
+-- 		local ArmorInfo = JMod.ArmorTable[armorData.name]
+-- 		if ( ArmorInfo.slots[slot] )then
+-- 			return id, armorData, ArmorInfo
+-- 		end
+-- 	end
+-- 	return nil
+-- end
 
 local sinfo = sinfo or {}
 if game.SinglePlayer() then
@@ -488,100 +493,100 @@ local ArmorResourceNiceNames = {
 
 local pf = "hud/boredhud/murvivi/Pieces/"
 
-local BoHU_JMOD_ArmorList = {
-	[241] = {
-		slot = "head",
-		tex = Material(pf.."Helmet"..".png", "mips smooth"),
-		x = 0,
-		y = -68,
-		weight = 1000,
-	},
-	[341] = {
-		slot = "eyes",
-		tex = Material(pf.."Eyes"..".png", "mips smooth"),
-		x = 0,
-		y = -57,
-		weight = 100,
-	},
-	[73] = {
-		slot = "mouthnose",
-		tex = Material(pf.."Mouth"..".png", "mips smooth"),
-		x = 0,
-		y = -52,
-		weight = 10,
-	},
-	[500] = {
-		slot = "ears",
-		x = 16,
-		y = -59,
-	},
-	[41] = {
-		slot = "leftshoulder",
-		tex = Material(pf.."Left Shoulder"..".png", "mips smooth"),
-		x = -20,
-		y = -34,
-	},
-	[31] = {
-		slot = "leftforearm",
-		tex = Material(pf.."Left Arm"..".png", "mips smooth"),
-		x = -28,
-		y = 0,
-	},
-	[21] = {
-		slot = "leftthigh",
-		tex = Material(pf.."Left Thigh"..".png", "mips smooth"),
-		x = -24,
-		y = 29,
-	},
-	[11] = {
-		slot = "leftcalf",
-		tex = Material(pf.."Left Leg"..".png", "mips smooth"),
-		x = -14,
-		y = 54,
-	},
-	--
-	[42] = {
-		slot = "rightshoulder",
-		tex = Material(pf.."Right Shoulder"..".png", "mips smooth"),
-		x = 20,
-		y = -34,
-	},
-	[32] = {
-		slot = "rightforearm",
-		tex = Material(pf.."Right Arm"..".png", "mips smooth"),
-		x = 28,
-		y = 0,
-	},
-	[22] = {
-		slot = "rightthigh",
-		tex = Material(pf.."Right Thigh"..".png", "mips smooth"),
-		x = 24,
-		y = 29,
-	},
-	[12] = {
-		slot = "rightcalf",
-		tex = Material(pf.."Right Leg"..".png", "mips smooth"),
-		x = 14,
-		y = 54,
-	},
-	[123] = {
-		slot = "chest",
-		tex = Material(pf.."Chest"..".png", "mips smooth"),
-		x = 0,
-		y = -17,
-	},
-	[2] = {
-		slot = "back",
-		x = 32,
-		y = -20,
-	},
-	[3] = {
-		slot = "pelvis",
-		tex = Material(pf.."Pelvis"..".png", "mips smooth"),
-		x = 2,
-		y = 14,
-	},
-}
+-- local BoHU_JMOD_ArmorList = {
+-- 	[241] = {
+-- 		slot = "head",
+-- 		tex = Material(pf.."Helmet"..".png", "mips smooth"),
+-- 		x = 0,
+-- 		y = -68,
+-- 		weight = 1000,
+-- 	},
+-- 	[341] = {
+-- 		slot = "eyes",
+-- 		tex = Material(pf.."Eyes"..".png", "mips smooth"),
+-- 		x = 0,
+-- 		y = -57,
+-- 		weight = 100,
+-- 	},
+-- 	[73] = {
+-- 		slot = "mouthnose",
+-- 		tex = Material(pf.."Mouth"..".png", "mips smooth"),
+-- 		x = 0,
+-- 		y = -52,
+-- 		weight = 10,
+-- 	},
+-- 	[500] = {
+-- 		slot = "ears",
+-- 		x = 16,
+-- 		y = -59,
+-- 	},
+-- 	[41] = {
+-- 		slot = "leftshoulder",
+-- 		tex = Material(pf.."Left Shoulder"..".png", "mips smooth"),
+-- 		x = -20,
+-- 		y = -34,
+-- 	},
+-- 	[31] = {
+-- 		slot = "leftforearm",
+-- 		tex = Material(pf.."Left Arm"..".png", "mips smooth"),
+-- 		x = -28,
+-- 		y = 0,
+-- 	},
+-- 	[21] = {
+-- 		slot = "leftthigh",
+-- 		tex = Material(pf.."Left Thigh"..".png", "mips smooth"),
+-- 		x = -24,
+-- 		y = 29,
+-- 	},
+-- 	[11] = {
+-- 		slot = "leftcalf",
+-- 		tex = Material(pf.."Left Leg"..".png", "mips smooth"),
+-- 		x = -14,
+-- 		y = 54,
+-- 	},
+-- 	--
+-- 	[42] = {
+-- 		slot = "rightshoulder",
+-- 		tex = Material(pf.."Right Shoulder"..".png", "mips smooth"),
+-- 		x = 20,
+-- 		y = -34,
+-- 	},
+-- 	[32] = {
+-- 		slot = "rightforearm",
+-- 		tex = Material(pf.."Right Arm"..".png", "mips smooth"),
+-- 		x = 28,
+-- 		y = 0,
+-- 	},
+-- 	[22] = {
+-- 		slot = "rightthigh",
+-- 		tex = Material(pf.."Right Thigh"..".png", "mips smooth"),
+-- 		x = 24,
+-- 		y = 29,
+-- 	},
+-- 	[12] = {
+-- 		slot = "rightcalf",
+-- 		tex = Material(pf.."Right Leg"..".png", "mips smooth"),
+-- 		x = 14,
+-- 		y = 54,
+-- 	},
+-- 	[123] = {
+-- 		slot = "chest",
+-- 		tex = Material(pf.."Chest"..".png", "mips smooth"),
+-- 		x = 0,
+-- 		y = -17,
+-- 	},
+-- 	[2] = {
+-- 		slot = "back",
+-- 		x = 32,
+-- 		y = -20,
+-- 	},
+-- 	[3] = {
+-- 		slot = "pelvis",
+-- 		tex = Material(pf.."Pelvis"..".png", "mips smooth"),
+-- 		x = 2,
+-- 		y = 14,
+-- 	},
+-- }
 
 hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 	if !GetConVar("boredhud_enable"):GetBool() or !GetConVar("cl_drawhud"):GetBool() then return end
@@ -739,7 +744,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 
 		local jump = 0
 		if hi.wp_ammoname and hi.wp_ammoname != NA then
-			local ammoname = language.GetPhrase(hi.wp_ammoname .. "_ammo")
+			local ammoname = hi.wp_ammoname
 			if string.len(ammoname) > 14 then
 				ammoname = string.Left(ammoname, 14 )..".."
 			end
@@ -966,7 +971,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
     end
 
 	-- Draw JMOD topleft tab
-	if GetConVar("boredhud_jmod"):GetBool() and P.EZarmor and !table.IsEmpty(P.EZarmor.items) then
+	if false then--if GetConVar("boredhud_jmod"):GetBool() and P.EZarmor and !table.IsEmpty(P.EZarmor.items) then
 		surface.SetDrawColor(BoHU_ColorWhite)
 		surface.SetTextColor(BoHU_ColorWhite)
 
@@ -990,7 +995,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 		local wwindex = 0
 
 		--local xd = 8
-		for i, v in SortedPairs(BoHU_JMOD_ArmorList, true) do
+		if false then--for i, v in SortedPairs(BoHU_JMOD_ArmorList, true) do
 			local slot = v.slot
 			local ItemID, ItemData, ItemInfo = BoHU_JMOD_GetItemInSlot( P.EZarmor, slot )
 			if ItemID then
