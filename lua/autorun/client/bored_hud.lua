@@ -102,7 +102,7 @@ local function generatefonts()
 	end
 end
 generatefonts()
-
+hook.Add("OnScreenSizeChanged", "RebuildBoHUFonts", generatefonts)
 cvars.AddChangeCallback("boredhud_scale", function()
 	generatefonts()
 end)
@@ -319,6 +319,15 @@ function BoHU.GetHUDInfo()
 		end
 		if info.wp_clip1 != NA and info.wp_maxclip1 != NA and info.wp_clip1 > info.wp_maxclip1 then
 			info.wp_clipextra1 = info.wp_clip1 - info.wp_maxclip1
+		end
+		if PW:Clip2() then
+			info.wp_clip2 = PW:Clip2()
+		end
+		if PW:GetMaxClip2() > 0 then
+			info.wp_maxclip2 = PW:GetMaxClip2()
+		end
+		if info.wp_clip2 != NA and info.wp_maxclip2 != NA and info.wp_clip2 > info.wp_maxclip2 then
+			info.wp_clipextra2 = info.wp_clip2 - info.wp_maxclip2
 		end
 		if PW:GetPrintName() then
 			info.wep_name = language.GetPhrase(PW:GetPrintName())
@@ -702,7 +711,11 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 					BoHU.Text( "+", {0, 0},              hi.scrw_g + hi.scrw - sm(28-1) + FUCKYOU, hi.scrh_g + hi.scrh - sm(34) )
 				end
 				surface.SetFont("BoHU_26")
+				if hi.pw.isDualwield then
+					BoHU.Text( hi.wp_clip1 .. "|" .. hi.wp_clip2, {2, 1}, hi.scrw_g + hi.scrw - sm(28), hi.scrh_g + hi.scrh - sm(18) )
+				else
 				BoHU.Text( hi.wp_clip1-s2remove, {2, 1}, hi.scrw_g + hi.scrw - sm(28), hi.scrh_g + hi.scrh - sm(18) )
+				end
 
 				surface.SetFont("BoHU_8")
 				BoHU.Text("AMMO", {2, 1}, hi.scrw_g + hi.scrw - sm(28), hi.scrh_g + hi.scrh - sm(34) )
