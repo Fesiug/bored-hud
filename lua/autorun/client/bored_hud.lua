@@ -365,7 +365,7 @@ function BoHU.GetHUDInfo()
 			if GetConVar("boredhud_enable_ammo_trivia"):GetBool() and (PW:GetBuff_Override("Override_Trivia_Calibre") or PW.Trivia_Calibre) then info.wp_ammoname = (PW:GetBuff_Override("Override_Trivia_Calibre") or PW.Trivia_Calibre) end
 			if PW:GetInUBGL() then
 				info.wp_ammoname = language.GetPhrase((game.GetAmmoName(ammotyp2) or "") .. "_ammo")
-				info.wp_maxclip1 = PW:GetBuff("UBGL_ClipSize") or 1
+				info.wp_maxclip1 = PW:GetBuff_Override("UBGL_Capacity") or 1
 			end
 		elseif PW.ARC9 then
 			--info.wp_firemode	= "fuCk"
