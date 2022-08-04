@@ -310,7 +310,10 @@ function BoHU.GetHUDInfo()
 	info.wp_ammo1 = NA
 	info.wp_ammo2 = NA
 	info.wp_ammoname = NA
+	info.wp_ammoname2 = NA
 	info.wp_firemode = NA
+	info.wp_firemode2 = NA
+	info.wp_ubgl = false
 
 	if P:GetActiveWeapon() and P:GetActiveWeapon():IsValid() then
 		local PW = P:GetActiveWeapon() or NULL
@@ -345,6 +348,7 @@ function BoHU.GetHUDInfo()
 		end
 		if ammotyp2 > -1 then
 			info.wp_ammo2 = P:GetAmmoCount(ammotyp2) or 0
+			info.wp_ammoname2 = language.GetPhrase((game.GetAmmoName(ammotyp2) or "") .. "_ammo")
 		end
 		if info.wp_clip1 == -1 and info.wp_ammo1 != NA and info.wp_ammo1 > 0 then
 			info.wp_clip1 = info.wp_ammo1
@@ -358,14 +362,18 @@ function BoHU.GetHUDInfo()
 			local HD = PW:GetHUDData()
 			info.wp_firemode	= HD.mode
 			info.wp_clip1		= HD.clip
-			info.wp_ammo1		= HD.ammo
+			info.wp_ammo1		= P:GetAmmoCount(ammotype)
 			info.wp_maxclip1	= PW:GetCapacity()
 			info.wp_clipextra1	= HD.plus
-			info.wp_clip2		= HD.ubgl
+			--info.wp_clip2		= HD.ubgl
 			if GetConVar("boredhud_enable_ammo_trivia"):GetBool() and (PW:GetBuff_Override("Override_Trivia_Calibre") or PW.Trivia_Calibre) then info.wp_ammoname = (PW:GetBuff_Override("Override_Trivia_Calibre") or PW.Trivia_Calibre) end
-			if PW:GetInUBGL() then
-				info.wp_ammoname = language.GetPhrase((game.GetAmmoName(ammotyp2) or "") .. "_ammo")
-				info.wp_maxclip1 = PW:GetBuff_Override("UBGL_Capacity") or 1
+			do
+				info.wp_ubgl		= PW:GetBuff_Override("UBGL")
+				info.wp_clip2		= HD.clip2
+				info.wp_ammo2		= HD.ammo2
+				info.wp_firemode2	= PW:GetBuff_Override("UBGL_Automatic") and "Automatic" or "Semi-auto"
+				--info.wp_ammoname = language.GetPhrase((game.GetAmmoName(ammotyp2) or "") .. "_ammo")
+				--info.wp_maxclip1 = PW:GetBuff_Override("UBGL_Capacity") or 1
 			end
 		elseif PW.ARC9 then
 			--info.wp_firemode	= "fuCk"
@@ -374,6 +382,7 @@ function BoHU.GetHUDInfo()
 			info.wp_maxclip1	= PW:GetCapacity(false)
 			info.wp_clip2       = PW:Clip2()
 			info.wp_ammo2		= P:GetAmmoCount(PW:GetProcessedValue("UBGLAmmo"))
+			info.wp_ubgl		= PW:GetProcessedValue("UBGL")
 			info.wp_maxclip2	= PW:GetCapacity(true)
 
 			-- wtf arctic
@@ -413,7 +422,7 @@ function BoHU.GetHUDInfo()
 				elseif arc9_mode > 1 then
 					firemode_text = tostring(arc9_mode.Mode) .. "-ROUND BURST"
 				end
-				info.wp_firemode_ubgl	= firemode_text or NA
+				info.wp_firemode2	= firemode_text or NA
 			end
 
 			if PW:GetInfiniteAmmo() then
@@ -762,104 +771,104 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 
 	-- Draw alt ammo
 	if GetConVar("boredhud_enable_ammo"):GetBool() then
-	if hi.pw and hi.pw.ARC9 and hi.pw:GetProcessedValue("UBGL") then
-		local gaaaw = 0--sm(100+8)
-		local gaaah = sm(38)
-		local gaasc = 0.9
+		if hi.pw and hi.wp_ubgl then
+			local gaaaw = 0--sm(100+8)
+			local gaaah = sm(38)
+			local gaasc = 0.9
 
-		surface.SetDrawColor(BoHU_ColorWhite)
-		surface.SetTextColor(BoHU_ColorWhite)
-
-		local cut
-		if tonumber(hi.wp_clip2) and hi.wp_maxclip2 and hi.wp_maxclip2 != NA then
-			cut = math.min(hi.wp_clip2/hi.wp_maxclip2,1)
-		else
-			cut = 1
-		end
-		BoHU.ProgressBar(cut, 1, hi.scrw_g + hi.scrw - sm(16+100) + sm(100*(1-gaasc)) - gaaaw, hi.scrh_g + hi.scrh - sm(18) - gaaah, sm(100*gaasc), sm(4))
-		if hi.pw.ARC9 and hi.pw:GetProcessedValue("UBGLFiremodeName") and hi.pw:GetProcessedValue("UBGLFiremodeName") != NA then
-			surface.SetFont("BoHU_12")
-			BoHU.Text(hi.pw:GetProcessedValue("UBGLFiremodeName"), {2, 0}, hi.scrw_g + hi.scrw - sm(16+(100*0.5)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(13) - gaaah)
-		end
-
-		if hi.wp_clip2 and hi.wp_clip2 != NA then
-			if tonumber(hi.wp_clip2) then
-				local s2remove = 0
-				if hi.wp_clipextra2 and hi.wp_clipextra2 != NA then
-					s2remove = (!hi.pw.ArcCW and hi.wp_clipextra2 or 0)
-					surface.SetFont("BoHU_20")
-					local FUCKYOU = surface.GetTextSize(hi.wp_clip2-s2remove)/2
-					surface.SetFont("BoHU_8")
-					BoHU.Text( hi.wp_clipextra2, {0, 0}, hi.scrw_g + hi.scrw - sm(28*gaasc) + FUCKYOU - gaaaw, hi.scrh_g + hi.scrh - sm(29) - gaaah )
-					BoHU.Text( "+", {0, 0},              hi.scrw_g + hi.scrw - sm(28*gaasc) + FUCKYOU - gaaaw, hi.scrh_g + hi.scrh - sm(34) - gaaah )
-				end
-				surface.SetFont("BoHU_20")
-				BoHU.Text( hi.wp_clip2-s2remove, {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(20) - gaaah )
-
-				surface.SetFont("BoHU_8")
-				BoHU.Text("AMMO", {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(32) - gaaah )
-			else
-				surface.SetFont("BoHU_20")
-				BoHU.Text( hi.wp_clip2, {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(20) - gaaah )
-
-				surface.SetFont("BoHU_8")
-				BoHU.Text("AMMO", {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(32) - gaaah )
-			end
-		end
-
-		if hi.wp_ammo2 and hi.wp_ammo2 != NA then
-			local as = 36*(0.9)
-			surface.SetFont("BoHU_16")
-			BoHU.Text( hi.wp_ammo2, {2, 1}, hi.scrw_g + hi.scrw - sm((28+as)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(20+1) - gaaah )
-
-			surface.SetFont("BoHU_8")
-			BoHU.Text("RESERVE", {2, 1}, hi.scrw_g + hi.scrw - sm((28+as)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(32-1) - gaaah )
-		end
-
-		local jump = 0
-		if hi.pw.ARC9 and 	hi.pw:GetProcessedValue("UBGLAmmo") and hi.pw:GetProcessedValue("UBGLAmmo") != NA then
-			local ammoname = language.GetPhrase(hi.pw:GetProcessedValue("UBGLAmmo") .. "_ammo")
-			if string.len(ammoname) > 14 then
-				ammoname = string.Left(ammoname, 14 )..".."
-			end
-			surface.SetFont("BoHU_8")
-			BoHU.Text(string.upper(ammoname), {2, 1}, hi.scrw_g + hi.scrw - sm(96*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(22) - gaaah )
-			jump = jump + 6
-		end
-		if hi.wp_firemode_ubgl and hi.wp_firemode_ubgl != NA then
-			surface.SetFont("BoHU_8")
-			BoHU.Text(string.upper(hi.wp_firemode_ubgl), {2, 1}, hi.scrw_g + hi.scrw - sm(96*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(22 + jump) - gaaah )
-		end
-	elseif (hi.pw and hi.pw.ARC9 and hi.pw:GetProcessedValue("UBGL")) then
-		local hm = hi.wp_ammo2
-		if hi.pw and hi.pw:IsValid() and hi.pw:IsScripted() then hm = hi.wp_clip2 end
-		hm = tonumber(hm)
-		if hm and hm != NA and hm > -1 then
 			surface.SetDrawColor(BoHU_ColorWhite)
 			surface.SetTextColor(BoHU_ColorWhite)
-			local perc = 0
-			if hi.wp_maxclip2 and hi.wp_maxclip2 != NA then
-				perc = hm / hi.wp_maxclip2
-			elseif hm > 0 then
-				perc = 1
+
+			local cut
+			if tonumber(hi.wp_clip2) and hi.wp_maxclip2 and hi.wp_maxclip2 != NA then
+				cut = math.min(hi.wp_clip2/hi.wp_maxclip2,1)
+			else
+				cut = 1
+			end
+			BoHU.ProgressBar(cut, 1, hi.scrw_g + hi.scrw - sm(16+100) + sm(100*(1-gaasc)) - gaaaw, hi.scrh_g + hi.scrh - sm(18) - gaaah, sm(100*gaasc), sm(4))
+			--do
+			--	surface.SetFont("BoHU_12")
+			--	BoHU.Text("Underbarrel", {2, 0}, hi.scrw_g + hi.scrw - sm(16+(100*0.5)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(13) - gaaah)
+			--end
+
+			if hi.wp_clip2 and hi.wp_clip2 != NA then
+				if tonumber(hi.wp_clip2) then
+					local s2remove = 0
+					if hi.wp_clipextra2 and hi.wp_clipextra2 != NA then
+						s2remove = (!hi.pw.ArcCW and hi.wp_clipextra2 or 0)
+						surface.SetFont("BoHU_20")
+						local FUCKYOU = surface.GetTextSize(hi.wp_clip2-s2remove)/2
+						surface.SetFont("BoHU_8")
+						BoHU.Text( hi.wp_clipextra2, {0, 0}, hi.scrw_g + hi.scrw - sm(28*gaasc) + FUCKYOU - gaaaw, hi.scrh_g + hi.scrh - sm(29) - gaaah )
+						BoHU.Text( "+", {0, 0},              hi.scrw_g + hi.scrw - sm(28*gaasc) + FUCKYOU - gaaaw, hi.scrh_g + hi.scrh - sm(34) - gaaah )
+					end
+					surface.SetFont("BoHU_20")
+					BoHU.Text( hi.wp_clip2-s2remove, {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(20) - gaaah )
+
+					surface.SetFont("BoHU_8")
+					BoHU.Text("AMMO", {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(32) - gaaah )
+				else
+					surface.SetFont("BoHU_20")
+					BoHU.Text( hi.wp_clip2, {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(20) - gaaah )
+
+					surface.SetFont("BoHU_8")
+					BoHU.Text("AMMO", {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(32) - gaaah )
+				end
 			end
 
-			local gap = 20 + 20
-			if altgap != 1 then
-				gap = 20 + 125
-			end
-			BoHU.OutlinedRect(hi.scrw_g + hi.scrw - sm(gap), hi.scrh_g + hi.scrh - sm(18), sm(25), sm(4))
-			BoHU.Rect(hi.scrw_g + hi.scrw - sm(gap) + sm(25*(1-perc)), hi.scrh_g + hi.scrh - sm(18), sm(25*perc), sm(4))
-
-			if hm and hm != NA then
-				surface.SetFont("BoHU_26")
-				BoHU.Text( hm, {2, 1}, hi.scrw_g + hi.scrw - sm(28*altgap), hi.scrh_g + hi.scrh - sm(18) )
+			if hi.wp_ammo2 and hi.wp_ammo2 != NA then
+				local as = 36*(0.9)
+				surface.SetFont("BoHU_16")
+				BoHU.Text( hi.wp_ammo2, {2, 1}, hi.scrw_g + hi.scrw - sm((28+as)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(20+1) - gaaah )
 
 				surface.SetFont("BoHU_8")
-				BoHU.Text("ALT", {2, 1}, hi.scrw_g + hi.scrw - sm(28*altgap), hi.scrh_g + hi.scrh - sm(34) )
+				BoHU.Text("RESERVE", {2, 1}, hi.scrw_g + hi.scrw - sm((28+as)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(32-1) - gaaah )
+			end
+
+			local jump = 0
+			local ammoname = hi.wp_ammoname2
+			if ammoname != NA then
+				if string.len(ammoname) > 14 then
+					ammoname = string.Left(ammoname, 14 )..".."
+				end
+				surface.SetFont("BoHU_8")
+				BoHU.Text(string.upper(ammoname), {2, 1}, hi.scrw_g + hi.scrw - sm(96*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(22) - gaaah )
+				jump = jump + 6
+			end
+			if hi.wp_firemode2 and hi.wp_firemode2 != NA then
+				surface.SetFont("BoHU_8")
+				BoHU.Text(string.upper(hi.wp_firemode2), {2, 1}, hi.scrw_g + hi.scrw - sm(96*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(22 + jump) - gaaah )
+			end
+		elseif (hi.pw and hi.pw.ARC9 and hi.pw:GetProcessedValue("UBGL")) then
+			local hm = hi.wp_ammo2
+			if hi.pw and hi.pw:IsValid() and hi.pw:IsScripted() then hm = hi.wp_clip2 end
+			hm = tonumber(hm)
+			if hm and hm != NA and hm > -1 then
+				surface.SetDrawColor(BoHU_ColorWhite)
+				surface.SetTextColor(BoHU_ColorWhite)
+				local perc = 0
+				if hi.wp_maxclip2 and hi.wp_maxclip2 != NA then
+					perc = hm / hi.wp_maxclip2
+				elseif hm > 0 then
+					perc = 1
+				end
+
+				local gap = 20 + 20
+				if altgap != 1 then
+					gap = 20 + 125
+				end
+				BoHU.OutlinedRect(hi.scrw_g + hi.scrw - sm(gap), hi.scrh_g + hi.scrh - sm(18), sm(25), sm(4))
+				BoHU.Rect(hi.scrw_g + hi.scrw - sm(gap) + sm(25*(1-perc)), hi.scrh_g + hi.scrh - sm(18), sm(25*perc), sm(4))
+
+				if hm and hm != NA then
+					surface.SetFont("BoHU_26")
+					BoHU.Text( hm, {2, 1}, hi.scrw_g + hi.scrw - sm(28*altgap), hi.scrh_g + hi.scrh - sm(18) )
+
+					surface.SetFont("BoHU_8")
+					BoHU.Text("ALT", {2, 1}, hi.scrw_g + hi.scrw - sm(28*altgap), hi.scrh_g + hi.scrh - sm(34) )
+				end
 			end
 		end
-	end
 	end
 
 	-- Citizen panel
