@@ -785,7 +785,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 			else
 				cut = 1
 			end
-			BoHU.ProgressBar(cut, 1, hi.scrw_g + hi.scrw - sm(16+100) + sm(100*(1-gaasc)) - gaaaw, hi.scrh_g + hi.scrh - sm(18) - gaaah, sm(100*gaasc), sm(4))
+			BoHU.ProgressBar(cut, 1, hi.scrw_g + hi.scrw - sm(16+100) + sm(100*(1-gaasc)) - gaaaw, hi.scrh_g + hi.scrh - sm(18 - 6) - gaaah, sm(100*gaasc), sm(4))
 			--do
 			--	surface.SetFont("BoHU_12")
 			--	BoHU.Text("Underbarrel", {2, 0}, hi.scrw_g + hi.scrw - sm(16+(100*0.5)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(13) - gaaah)
@@ -799,30 +799,30 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 						surface.SetFont("BoHU_20")
 						local FUCKYOU = surface.GetTextSize(hi.wp_clip2-s2remove)/2
 						surface.SetFont("BoHU_8")
-						BoHU.Text( hi.wp_clipextra2, {0, 0}, hi.scrw_g + hi.scrw - sm(28*gaasc) + FUCKYOU - gaaaw, hi.scrh_g + hi.scrh - sm(29) - gaaah )
-						BoHU.Text( "+", {0, 0},              hi.scrw_g + hi.scrw - sm(28*gaasc) + FUCKYOU - gaaaw, hi.scrh_g + hi.scrh - sm(34) - gaaah )
+						BoHU.Text( hi.wp_clipextra2, {0, 0}, hi.scrw_g + hi.scrw - sm(28*gaasc) + FUCKYOU - gaaaw, hi.scrh_g + hi.scrh - sm(29 - 6) - gaaah )
+						BoHU.Text( "+", {0, 0},              hi.scrw_g + hi.scrw - sm(28*gaasc) + FUCKYOU - gaaaw, hi.scrh_g + hi.scrh - sm(34 - 6) - gaaah )
 					end
 					surface.SetFont("BoHU_20")
-					BoHU.Text( hi.wp_clip2-s2remove, {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(20) - gaaah )
+					BoHU.Text( hi.wp_clip2-s2remove, {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(20 - 6) - gaaah )
 
 					surface.SetFont("BoHU_8")
-					BoHU.Text("AMMO", {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(32) - gaaah )
+					BoHU.Text("AMMO", {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(32 - 6) - gaaah )
 				else
 					surface.SetFont("BoHU_20")
-					BoHU.Text( hi.wp_clip2, {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(20) - gaaah )
+					BoHU.Text( hi.wp_clip2, {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(20 - 6) - gaaah )
 
 					surface.SetFont("BoHU_8")
-					BoHU.Text("AMMO", {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(32) - gaaah )
+					BoHU.Text("AMMO", {2, 1}, hi.scrw_g + hi.scrw - sm(28) - gaaaw, hi.scrh_g + hi.scrh - sm(32 - 6) - gaaah )
 				end
 			end
 
 			if hi.wp_ammo2 and hi.wp_ammo2 != NA then
 				local as = 36*(0.9)
 				surface.SetFont("BoHU_16")
-				BoHU.Text( hi.wp_ammo2, {2, 1}, hi.scrw_g + hi.scrw - sm((28+as)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(20+1) - gaaah )
+				BoHU.Text( hi.wp_ammo2, {2, 1}, hi.scrw_g + hi.scrw - sm((28+as)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(20+1 - 6) - gaaah )
 
 				surface.SetFont("BoHU_8")
-				BoHU.Text("RESERVE", {2, 1}, hi.scrw_g + hi.scrw - sm((28+as)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(32-1) - gaaah )
+				BoHU.Text("RESERVE", {2, 1}, hi.scrw_g + hi.scrw - sm((28+as)*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(32-1 - 6) - gaaah )
 			end
 
 			local jump = 0
@@ -832,14 +832,14 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 					ammoname = string.Left(ammoname, 14 )..".."
 				end
 				surface.SetFont("BoHU_8")
-				BoHU.Text(string.upper(ammoname), {2, 1}, hi.scrw_g + hi.scrw - sm(96*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(22) - gaaah )
+				BoHU.Text(string.upper(ammoname), {2, 1}, hi.scrw_g + hi.scrw - sm(96*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(22 - 6) - gaaah )
 				jump = jump + 6
 			end
 			if hi.wp_firemode2 and hi.wp_firemode2 != NA then
 				surface.SetFont("BoHU_8")
-				BoHU.Text(string.upper(hi.wp_firemode2), {2, 1}, hi.scrw_g + hi.scrw - sm(96*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(22 + jump) - gaaah )
+				BoHU.Text(string.upper(hi.wp_firemode2), {2, 1}, hi.scrw_g + hi.scrw - sm(96*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(22 - 6 + jump) - gaaah )
 			end
-		elseif (hi.pw and hi.pw.ARC9 and hi.pw:GetProcessedValue("UBGL")) then
+		elseif hi.pw then
 			local hm = hi.wp_ammo2
 			if hi.pw and hi.pw:IsValid() and hi.pw:IsScripted() then hm = hi.wp_clip2 end
 			hm = tonumber(hm)
