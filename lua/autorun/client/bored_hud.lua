@@ -363,6 +363,9 @@ function BoHU.GetHUDInfo()
 			info.wp_firemode	= HD.mode
 			info.wp_clip1		= HD.clip
 			info.wp_ammo1		= P:GetAmmoCount(ammotype)
+			if PW:HasInfiniteAmmo() then
+				info.wp_ammo1		= "∞"
+			end
 			info.wp_maxclip1	= PW:GetCapacity()
 			info.wp_clipextra1	= HD.plus
 			--info.wp_clip2		= HD.ubgl
