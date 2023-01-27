@@ -839,7 +839,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 				surface.SetFont("BoHU_8")
 				BoHU.Text(string.upper(hi.wp_firemode2), {2, 1}, hi.scrw_g + hi.scrw - sm(96*gaasc) - gaaaw, hi.scrh_g + hi.scrh - sm(22 - 6 + jump) - gaaah )
 			end
-		elseif hi.pw then
+		elseif hi.pw and !hi.pw.isDualwield then
 			local hm = hi.wp_ammo2
 			if hi.pw and hi.pw:IsValid() and hi.pw:IsScripted() then hm = hi.wp_clip2 end
 			hm = tonumber(hm)
