@@ -884,13 +884,13 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 		elseif hi.pw and !hi.pw.isDualwield then
 			local hm = hi.wp_ammo2
 			if hi.pw and hi.pw:IsValid() and hi.pw:IsScripted() then hm = hi.wp_clip2 end
-			if hm then
+			if hm and hm != NA then
 				surface.SetDrawColor(BoHU_ColorWhite)
 				surface.SetTextColor(BoHU_ColorWhite)
 				local perc = 0
-				if tonumber(hm) != NA and hi.wp_maxclip2 != NA then
+				if tonumber(hm) and isnumber(hi.wp_maxclip2) then
 					perc = tonumber(hm) / hi.wp_maxclip2
-				elseif !isnumber(hm) or hm > 0 then
+				elseif !isnumber(hm) or tonumber(hm) > 0 then
 					perc = 1
 				end
 
@@ -901,13 +901,12 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 				BoHU.OutlinedRect(hi.scrw_g + hi.scrw - sm(gap), hi.scrh_g + hi.scrh - sm(18), sm(25), sm(4))
 				BoHU.Rect(hi.scrw_g + hi.scrw - sm(gap) + sm(25*(1-perc)), hi.scrh_g + hi.scrh - sm(18), sm(25*perc), sm(4))
 
-				if hi.wp_ammo2 then
-					surface.SetFont("BoHU_26")
-					BoHU.Text( hm, {2, 1}, hi.scrw_g + hi.scrw - sm(gap - 25 / 2), hi.scrh_g + hi.scrh - sm(18) )
 
-					surface.SetFont("BoHU_8")
-					BoHU.Text(hi.wp_alttext, {2, 1}, hi.scrw_g + hi.scrw - sm(gap - 25 / 2), hi.scrh_g + hi.scrh - sm(34) )
-				end
+				surface.SetFont("BoHU_26")
+				BoHU.Text(hm, {2, 1}, hi.scrw_g + hi.scrw - sm(gap - 25 / 2), hi.scrh_g + hi.scrh - sm(18) )
+
+				surface.SetFont("BoHU_8")
+				BoHU.Text(hi.wp_alttext, {2, 1}, hi.scrw_g + hi.scrw - sm(gap - 25 / 2), hi.scrh_g + hi.scrh - sm(34) )
 			end
 		end
 	end
