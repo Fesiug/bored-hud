@@ -889,7 +889,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 				surface.SetTextColor(BoHU_ColorWhite)
 				local perc = 0
 				if tonumber(hm) != nil and isnumber(hi.wp_maxclip2) then
-					perc = tonumber(hm) / hi.wp_maxclip2
+					perc = math.Clamp(tonumber(hm) / hi.wp_maxclip2, 0, 1)
 				elseif !isnumber(hm) or tonumber(hm) > 0 then
 					perc = 1
 				end
