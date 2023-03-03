@@ -476,7 +476,7 @@ function BoHU.GetHUDInfo()
 			if PW:GetValue("CanQuickNade") then
 				info.wp_ubgl		= false
 				info.wp_ammo2		= NA
-				info.wp_maxclip2	= NA
+				info.wp_maxclip2	= 1
 
 				local nade = PW:GetGrenade()
 
@@ -888,7 +888,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 				surface.SetDrawColor(BoHU_ColorWhite)
 				surface.SetTextColor(BoHU_ColorWhite)
 				local perc = 0
-				if tonumber(hm) and isnumber(hi.wp_maxclip2) then
+				if tonumber(hm) != nil and isnumber(hi.wp_maxclip2) then
 					perc = tonumber(hm) / hi.wp_maxclip2
 				elseif !isnumber(hm) or tonumber(hm) > 0 then
 					perc = 1
