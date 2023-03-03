@@ -884,7 +884,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 		elseif hi.pw and !hi.pw.isDualwield then
 			local hm = hi.wp_ammo2
 			if hi.pw and hi.pw:IsValid() and hi.pw:IsScripted() then hm = hi.wp_clip2 end
-			if hm and hm != NA then
+			if hm and hm != NA and (!tonumber(hm) or tonumber(hm) >= 0) then
 				surface.SetDrawColor(BoHU_ColorWhite)
 				surface.SetTextColor(BoHU_ColorWhite)
 				local perc = 0
