@@ -314,6 +314,7 @@ function BoHU.GetHUDInfo()
 	info.wp_firemode = NA
 	info.wp_firemode2 = NA
 	info.wp_ubgl = false
+	info.wp_alttext = "ALT" -- altfire title
 
 	if P:GetActiveWeapon() and P:GetActiveWeapon():IsValid() then
 		local PW = P:GetActiveWeapon() or NULL
@@ -444,17 +445,50 @@ function BoHU.GetHUDInfo()
 			if PW.Stats["Age"] then
 				info.wp_clip2		= 100-math.Round(PW:GetAge()*100)
 			end
-        elseif PW.Primary and PW.Primary.RPM then
-            local m9ksucks
-            if PW.Primary.Burst then
-                m9ksucks = "BURST"
-            elseif PW.Primary.Automatic then
-                m9ksucks = "AUTOMATIC"
-            else
-                m9ksucks = "SEMI-AUTO"
-            end
-            info.wp_firemode = m9ksucks
-        else--ASTW2--if PW.last_aimvector then
+		elseif PW.Primary and PW.Primary.RPM then
+			local m9ksucks
+			if PW.Primary.Burst then
+				m9ksucks = "BURST"
+			elseif PW.Primary.Automatic then
+				m9ksucks = "AUTOMATIC"
+			else
+				m9ksucks = "SEMI-AUTO"
+			end
+			info.wp_firemode = m9ksucks
+		elseif PW.ArcticTacRP then
+			local mode = PW:GetCurrentFiremode()
+			if PW:GetSafe() then
+				info.wp_firemode = "SAFETY"
+			elseif PW.FiremodeName and ((istable(PW.FiremodeName) and PW.FiremodeName[mode]) or isstring(PW.FiremodeName)) then
+				info.wp_firemode = istable(PW.FiremodeName) and PW.FiremodeName[mode] or PW.FiremodeName
+			elseif mode == 1 then
+				info.wp_firemode = "SEMI-AUTO"
+			elseif mode == 2 then
+				info.wp_firemode = "AUTOMATIC"
+			elseif mode < 1 then
+				info.wp_firemode = tostring(math.abs(mode)) .. "-ROUND BURST"
+			end
+
+			if PW:GetInfiniteAmmo() then
+				info.wp_ammo1 = "∞"
+			end
+
+			if PW:GetValue("CanQuickNade") then
+				info.wp_ubgl		= false
+				info.wp_ammo2		= NA
+				info.wp_maxclip2	= NA
+
+				info.wp_alttext		= "NADE"
+
+				local nade = PW:GetGrenade()
+				if nade.Ammo then
+					info.wp_clip2		= tostring(P:GetAmmoCount(nade.Ammo))
+					info.wp_alttext		= nade.PrintName or "NADE"
+				else
+					info.wp_clip2		= "∞"
+				end
+
+			end
 		end
 
 		-- i am hack
@@ -479,7 +513,7 @@ function BoHU.GetHUDInfo()
 	end
 
 	local t = hook.Run("BoHU_GetHUDInfo", self, info)
-    info = t and t.info or info
+	info = t and t.info or info
 
 	return info
 end
@@ -497,12 +531,12 @@ end
 
 local sinfo = sinfo or {}
 if game.SinglePlayer() then
-    net.Start("BoHU_SquadInfo")
-    net.SendToServer()
+	net.Start("BoHU_SquadInfo")
+	net.SendToServer()
 
-    net.Receive("BoHU_SquadInfo", function()
-        sinfo = net.ReadTable()
-    end)
+	net.Receive("BoHU_SquadInfo", function()
+		sinfo = net.ReadTable()
+	end)
 end
 
 local ArmorResourceNiceNames = {
@@ -790,7 +824,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 
 			local cut
 			if tonumber(hi.wp_clip2) and hi.wp_maxclip2 and hi.wp_maxclip2 != NA then
-				cut = math.min(hi.wp_clip2/hi.wp_maxclip2,1)
+				cut = math.min(hi.wp_clip2 / hi.wp_maxclip2, 1)
 			else
 				cut = 1
 			end
@@ -871,39 +905,39 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 
 				if hm and hm != NA then
 					surface.SetFont("BoHU_26")
-					BoHU.Text( hm, {2, 1}, hi.scrw_g + hi.scrw - sm(28*altgap), hi.scrh_g + hi.scrh - sm(18) )
+					BoHU.Text( hm, {2, 1}, hi.scrw_g + hi.scrw - sm(gap - 25 / 2), hi.scrh_g + hi.scrh - sm(18) )
 
 					surface.SetFont("BoHU_8")
-					BoHU.Text("ALT", {2, 1}, hi.scrw_g + hi.scrw - sm(28*altgap), hi.scrh_g + hi.scrh - sm(34) )
+					BoHU.Text(hi.wp_alttext, {2, 1}, hi.scrw_g + hi.scrw - sm(gap - 25 / 2), hi.scrh_g + hi.scrh - sm(34) )
 				end
 			end
 		end
 	end
 
 	-- Citizen panel
-    if GetConVar("boredhud_enable_squads"):GetBool() and game.SinglePlayer() and sinfo then
-    	local xd = 13
-        for i, v in ipairs(sinfo) do
-            if !v:IsValid() then return end
-            local durability = math.Round((v:Health()/v:GetMaxHealth()*100), 0) .. "%"
-            local item = "#" .. v:GetClass()
+	if GetConVar("boredhud_enable_squads"):GetBool() and game.SinglePlayer() and sinfo then
+		local xd = 13
+		for i, v in ipairs(sinfo) do
+			if !v:IsValid() then return end
+			local durability = math.Round((v:Health()/v:GetMaxHealth()*100), 0) .. "%"
+			local item = "#" .. v:GetClass()
 
-            surface.SetDrawColor(BoHU_ColorWhite)
-            surface.SetTextColor(BoHU_ColorWhite)
+			surface.SetDrawColor(BoHU_ColorWhite)
+			surface.SetTextColor(BoHU_ColorWhite)
 
-            surface.SetFont("BoHU_8")
-            BoHU.Text(item, {0, 1}, hi.scrw_g + sm(16), hi.scrh_g + sm(6) + sm(xd))
+			surface.SetFont("BoHU_8")
+			BoHU.Text(item, {0, 1}, hi.scrw_g + sm(16), hi.scrh_g + sm(6) + sm(xd))
 
-            surface.SetFont("BoHU_8")
-            BoHU.Text(durability, {0, 1}, hi.scrw_g + sm(64 + 16 + 2), hi.scrh_g + sm(11) + sm(xd))
+			surface.SetFont("BoHU_8")
+			BoHU.Text(durability, {0, 1}, hi.scrw_g + sm(64 + 16 + 2), hi.scrh_g + sm(11) + sm(xd))
 
-            BoHU.ProgressBar(v:Health()/v:GetMaxHealth(), 0, hi.scrw_g + sm(16), hi.scrh_g + sm(7) + sm(xd), sm(64), sm(2))
-            xd = xd + 13
-        end
-    end
+			BoHU.ProgressBar(v:Health()/v:GetMaxHealth(), 0, hi.scrw_g + sm(16), hi.scrh_g + sm(7) + sm(xd), sm(64), sm(2))
+			xd = xd + 13
+		end
+	end
 
 	-- ArcCW info panel
-    if false and hi.pw and hi.pw.ArcCW then
+	if false and hi.pw and hi.pw.ArcCW then
 		surface.SetDrawColor(BoHU_ColorWhite)
 		surface.SetTextColor(BoHU_ColorWhite)
 
@@ -920,10 +954,10 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 			xd = xd + 1
 		end
 
-    end
+	end
 
 	-- Rangefinder
-    if GetConVar("boredhud_enable_rangefinder"):GetBool() then
+	if GetConVar("boredhud_enable_rangefinder"):GetBool() then
 		surface.SetDrawColor(BoHU_ColorWhite)
 		surface.SetTextColor(BoHU_ColorWhite)
 
@@ -956,6 +990,14 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 				BoHU.Text( "Effective from " .. math.Round(wo1*ARC9.HUToM) .. " to " .. math.Round(wo2*ARC9.HUToM) .. " meters", {1, 1}, hi.scrw_g + hi.scrw - sm(0 + 16), hi.scrh_g + sm(13+7+10))
 				BoHU.Text( math.Round( hi.pw:GetDamageAtRange(supea*ARC9.HUToM) ) .. " damage", {1, 1}, hi.scrw_g + hi.scrw - sm(0 + 16), hi.scrh_g + sm(13+7+10+7))
 				BoHU.Text(math.Round(HOLYSHIT*100) .. "%", {1, 1}, hi.scrw_g + hi.scrw - sm(64 + 16 + 2), hi.scrh_g + sm(11) + sm(13))
+			elseif hi.pw.ArcticTacRP then
+				BoHU.Text("Weapon effectiveness", {1, 1}, hi.scrw_g + hi.scrw - sm(16), hi.scrh_g + sm(13+6))
+				local wo1, wo2 = hi.pw:GetValue("Range_Min"), hi.pw:GetValue("Range_Max")
+				HOLYSHIT = math.Clamp(1-math.TimeFraction( wo1, wo2, supea ), 0, 1)
+
+				BoHU.Text( "Effective from " .. math.Round(wo1) .. " to " .. math.Round(wo2) .. " hU", {1, 1}, hi.scrw_g + hi.scrw - sm(0 + 16), hi.scrh_g + sm(13+7+10))
+				BoHU.Text( math.Round( hi.pw:GetDamageAtRange(supea, true) * hi.pw:GetValue("Num") ) .. " damage", {1, 1}, hi.scrw_g + hi.scrw - sm(0 + 16), hi.scrh_g + sm(13+7+10+7))
+				BoHU.Text(math.Round(HOLYSHIT*100) .. "%", {1, 1}, hi.scrw_g + hi.scrw - sm(64 + 16 + 2), hi.scrh_g + sm(11) + sm(13))
 			else
 				BoHU.Text("Rangefinder", {1, 1}, hi.scrw_g + hi.scrw - sm(16), hi.scrh_g + sm(13+6))
 				fug = -14
@@ -987,7 +1029,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 			end
 
 		end
-    end
+	end
 
 	-- Draw JMOD topleft tab
 	if false then--if GetConVar("boredhud_jmod"):GetBool() and P.EZarmor and !table.IsEmpty(P.EZarmor.items) then
