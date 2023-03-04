@@ -99,7 +99,7 @@ local function generatefonts()
 			font = GetFont(),
 			size = ScreenScale(i) * GetConVar("boredhud_scale"):GetFloat() * 0.8,  -- fuck i made this at 80% scale in arccw
 			weight = GetConVar("boredhud_font_weight"):GetFloat(),
-			scanlines = GetConVar("boredhud_font_scanlines"):GetFloat() * GetConVar("boredhud_scale"):GetFloat(),
+			scanlines = GetConVar("boredhud_font_scanlines"):GetFloat(),
 			antialias = true,
 		} )
 	end
@@ -132,7 +132,7 @@ local bohuPanel = {
 	{ type = "f", text = "Deadzone X", var = "boredhud_deadx", min = 0.5, max = 1 },
 	{ type = "f", text = "Deadzone Y", var = "boredhud_deady", min = 0.5, max = 1 },
 	{ type = "t", text = "HUD Font", var = "boredhud_font"  },
-	{ type = "i", text = "HUD Font Scanlines", var = "boredhud_font_scanlines", min = 0, max = 5 },
+	{ type = "i", text = "HUD Font Scanlines", var = "boredhud_font_scanlines", min = 0, max = 10 },
 	{ type = "i", text = "HUD Font Weight", var = "boredhud_font_weight", min = 0, max = 1000 },
 	-- { type = "b", text = "Show JMod Equipment", var = "boredhud_jmod", },
 	-- { type = "f", text = "JMod Armor Intensity", var = "boredhud_jmod_intensity", min = 0, max = 1 },
