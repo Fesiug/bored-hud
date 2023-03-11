@@ -359,6 +359,8 @@ function BoHU.GetHUDInfo()
 			info.wp_firemode = PW.FireModeDisplay
 		elseif PW.IsTFAWeapon then
 			info.wp_firemode = PW:GetFireModeName()
+		elseif PW.Suburb then
+			info.wp_firemode = PW:GetFiremodeName()
 		elseif PW.ArcCW then
 			local HD = PW:GetHUDData()
 			info.wp_firemode	= HD.mode
