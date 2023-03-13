@@ -981,6 +981,14 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 				BoHU.Text( "Effective from " .. math.Round(wo1) .. " to " .. math.Round(wo2) .. " meters", {1, 1}, hi.scrw_g + hi.scrw - sm(0 + 16), hi.scrh_g + sm(13+7+10))
 				BoHU.Text( math.Round( hi.pw:GetDamage(supea*ArcCW.HUToM) ) .. " damage", {1, 1}, hi.scrw_g + hi.scrw - sm(0 + 16), hi.scrh_g + sm(13+7+10+7))
 				BoHU.Text(math.Round(HOLYSHIT*100) .. "%", {1, 1}, hi.scrw_g + hi.scrw - sm(64 + 16 + 2), hi.scrh_g + sm(11) + sm(13))
+			elseif hi.pw.Suburb then
+				BoHU.Text("Weapon effectiveness", {1, 1}, hi.scrw_g + hi.scrw - sm(16), hi.scrh_g + sm(13+6))
+				local wo1, wo2 = hi.pw.RangeNear, hi.pw.RangeFar
+				HOLYSHIT = math.Clamp(1-math.TimeFraction( wo1, wo2, supea * Suburb.HUToM ), 0, 1)
+
+				BoHU.Text( "Effective from " .. math.Round(wo1) .. " to " .. math.Round(wo2) .. " meters", {1, 1}, hi.scrw_g + hi.scrw - sm(0 + 16), hi.scrh_g + sm(13+7+10))
+				BoHU.Text( math.Round( Suburb.getdamagefromrange( hi.pw.DamageNear, hi.pw.DamageFar, hi.pw.RangeNear / Suburb.HUToM, hi.pw.RangeFar / Suburb.HUToM, supea ) ) .. " damage", {1, 1}, hi.scrw_g + hi.scrw - sm(0 + 16), hi.scrh_g + sm(13+7+10+7))
+				BoHU.Text(math.Round(HOLYSHIT*100) .. "%", {1, 1}, hi.scrw_g + hi.scrw - sm(64 + 16 + 2), hi.scrh_g + sm(11) + sm(13))
 			elseif hi.pw.ARC9 then
 				BoHU.Text("Weapon effectiveness", {1, 1}, hi.scrw_g + hi.scrw - sm(16), hi.scrh_g + sm(13+6))
 				local wo1, wo2 = hi.pw:GetProcessedValue("RangeMin"), hi.pw:GetProcessedValue("RangeMax")
