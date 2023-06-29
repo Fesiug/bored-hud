@@ -6,6 +6,8 @@ CreateClientConVar("boredhud_enable_suit",			1, true, false, "Draw HUD suit func
 CreateClientConVar("boredhud_enable_rangefinder",	0, true, false, "Draw HUD rangefinder?")
 CreateClientConVar("boredhud_enable_squads",		0, true, false, "Draw HUD citizen squads?")
 CreateClientConVar("boredhud_enable_ammo_trivia",	0, true, false, "Use ArcCW ammo trivia for the ammotype?")
+CreateClientConVar("boredhud_enable_killfeed",	0, true, false, "Draw HUD Killfeed?")
+CreateClientConVar("boredhud_killfeed_invert",	0, true, false, "Killfeed on other side of HUD??????? will conflict with rangefindre")
 
 CreateClientConVar("boredhud_scale",			1, true, false, "HUD scale")
 CreateClientConVar("boredhud_deadx",			1, true, false, "Deadzone x")
@@ -40,6 +42,8 @@ concommand.Add("boredhud_reset", function()
 	GetConVar("boredhud_enable_rangefinder"):Revert()
 	GetConVar("boredhud_enable_squads"):Revert()
 	GetConVar("boredhud_enable_ammo_trivia"):Revert()
+	GetConVar("boredhud_enable_killfeed"):Revert()
+	GetConVar("boredhud_killfeed_invert"):Revert()
 
 	GetConVar("boredhud_scale"):Revert()
 	GetConVar("boredhud_deadx"):Revert()
@@ -103,6 +107,14 @@ local function generatefonts()
 			antialias = true,
 		} )
 	end
+
+	surface.CreateFont( "BoHU_kf_cssfont", { -- blehhh
+		font = "csd",
+		size = ScreenScale(16) * GetConVar("boredhud_scale"):GetFloat() * 0.8,
+		weight = 0,
+		scanlines = GetConVar("boredhud_font_scanlines"):GetFloat(),
+		antialiasing = true,
+	} )
 end
 generatefonts()
 hook.Add("OnScreenSizeChanged", "RebuildBoHUFonts", generatefonts)
@@ -128,6 +140,8 @@ local bohuPanel = {
 	{ type = "b", text = "Rangefinder", var = "boredhud_enable_rangefinder", },
 	{ type = "b", text = "HL2 Squads", var = "boredhud_enable_squads", },
 	{ type = "b", text = "Use Trivia for Ammotype (for Tasky)", var = "boredhud_enable_ammo_trivia", },
+	{ type = "b", text = "Enable killfeed", var = "boredhud_enable_killfeed", },
+	{ type = "b", text = "Killfeed on right", var = "boredhud_killfeed_invert", },
 	{ type = "f", text = "HUD Scale", var = "boredhud_scale", min = 0.5, max = 2.5 },
 	{ type = "f", text = "Deadzone X", var = "boredhud_deadx", min = 0.5, max = 1 },
 	{ type = "f", text = "Deadzone Y", var = "boredhud_deady", min = 0.5, max = 1 },
@@ -391,7 +405,7 @@ function BoHU.GetHUDInfo()
 			--info.wp_firemode	= "fuCk"
 			info.wp_clip1		= PW:Clip1()
 			info.wp_ammo1		= P:GetAmmoCount(PW:GetPrimaryAmmoType())
-			info.wp_maxclip1	= PW:GetCapacity(false)
+			info.wp_maxclip1	= PW:GetValue("ClipSize")
 			info.wp_clip2       = PW:Clip2()
 			info.wp_ammo2		= P:GetAmmoCount(PW:GetProcessedValue("UBGLAmmo"))
 			info.wp_ubgl		= PW:GetProcessedValue("UBGL")
@@ -399,6 +413,15 @@ function BoHU.GetHUDInfo()
 
 			-- wtf arctic
 				-- what's your fuckin problem
+
+			if GetConVar("boredhud_enable_ammo_trivia"):GetBool() then
+				if PW:GetValue("EFTRoundName") then info.wp_ammoname = string.Replace(string.upper(PW:GetValue("EFTRoundName")), " GZH", "")
+				elseif PW.Trivia.Calibre then info.wp_ammoname = PW.Trivia.Calibre
+				elseif PW.Trivia.Caliber then info.wp_ammoname = PW.Trivia.Caliber
+				elseif PW.Trivia.Calibre2 then info.Calibre2 = PW.Trivia.Calibre2
+				end
+			end
+
 			do
 				local arc9_mode = PW:GetCurrentFiremodeTable()
 				local firemode_text = NA
@@ -641,6 +664,8 @@ local pf = "hud/boredhud/murvivi/Pieces/"
 -- 		y = 14,
 -- 	},
 -- }
+
+local bhkillfeed = {}
 
 hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 	if !GetConVar("boredhud_enable"):GetBool() or !GetConVar("cl_drawhud"):GetBool() then return end
@@ -1128,6 +1153,58 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 			dontcomenear = dontcomenear - 8
 		end]]
 	end
+
+
+
+	-- KIll    feed!!!!!!!!!
+
+	if !GetConVar("boredhud_enable_killfeed"):GetBool() then return end
+
+	for k, v in pairs(bhkillfeed) do
+		local decay = math.max(0, (v.time - CurTime())) * 750
+		
+		if decay <= 0 then
+			table.remove(bhkillfeed, k) -- removing old stains
+		end
+
+
+		local texxt1 = v.killer
+		local ww1 = surface.GetTextSize(texxt1)
+		local texxt2 = " [" .. language.GetPhrase(v.gun) .."] "
+		local ww2 = surface.GetTextSize(texxt2)
+		local texxt3 = v.hesdead
+		local ww3 = surface.GetTextSize(texxt3)
+		local texxt4 = v.headshot and "D" or ""
+		local ww4 = surface.GetTextSize(texxt4) * 3
+
+		if !GetConVar("boredhud_killfeed_invert"):GetBool() then
+			surface.SetTextColor(v.killercolor.r, v.killercolor.g, v.killercolor.b, decay)
+			BoHU.Text(texxt1, {0, 0}, hi.scrw_g + sm(19), hi.scrh_g + sm(12.25) + k * sm(8.95))
+			surface.SetTextColor(255, 255, 255, decay)
+			BoHU.Text(texxt2, {0, 0}, hi.scrw_g + sm(19) + ww1, hi.scrh_g + sm(12.25) + k * sm(8.95))
+			surface.SetFont("BoHU_kf_cssfont")
+			BoHU.Text(texxt4, {0, 0}, hi.scrw_g + sm(16) + ww1 + ww2, hi.scrh_g + sm(12.5) + k * sm(8.95))
+			surface.SetFont("BoHU_8")
+			surface.SetTextColor(v.enemycolor.r, v.enemycolor.g, v.enemycolor.b, decay)
+			BoHU.Text(texxt3, {0, 0}, hi.scrw_g + sm(19) + ww1 + ww2 + ww4, hi.scrh_g + sm(12.25) + k * sm(8.95))
+
+			surface.SetDrawColor(BoHU_ColorWhite.r, BoHU_ColorWhite.g, BoHU_ColorWhite.b, decay)
+			BoHU.ProgressBar(0, 0, hi.scrw_g + sm(16), hi.scrh_g + sm(11) + k * sm(8.95), ww1+ww2+ww3+ww4+sm(5), sm(9))
+		else
+			surface.SetTextColor(v.killercolor.r, v.killercolor.g, v.killercolor.b, decay)
+			BoHU.Text(texxt1, {2, 0}, hi.scrw_g + sm(19), hi.scrh_g + sm(12.25) + k * sm(8.95))
+			surface.SetTextColor(255, 255, 255, decay)
+			BoHU.Text(texxt2, {2, 0}, hi.scrw_g + sm(19) + ww1, hi.scrh_g + sm(12.25) + k * sm(8.95))
+			surface.SetFont("BoHU_kf_cssfont")
+			BoHU.Text(texxt4, {2, 0}, hi.scrw_g + sm(16) + ww1 + ww2, hi.scrh_g + sm(12.5) + k * sm(8.95))
+			surface.SetFont("BoHU_8")
+			surface.SetTextColor(v.enemycolor.r, v.enemycolor.g, v.enemycolor.b, decay)
+			BoHU.Text(texxt3, {2, 0}, hi.scrw_g + sm(19) + ww1 + ww2 + ww4, hi.scrh_g + sm(12.25) + k * sm(8.95))
+	
+			surface.SetDrawColor(BoHU_ColorWhite.r, BoHU_ColorWhite.g, BoHU_ColorWhite.b, decay)
+			BoHU.ProgressBar(0, 0, hi.scrw_g + sm(16), hi.scrh_g + sm(11) + k * sm(8.95), ww1+ww2+ww3+ww4+sm(5), sm(9))
+		end
+	end
 end )
 
 local hide = {
@@ -1145,3 +1222,45 @@ hook.Add( "HUDShouldDraw", "BoHU_HUDShouldDraw", function( name )
 		return false
 	end
 end )
+
+
+
+
+local npcenemycolor = Color(216, 83, 83)
+
+local function kfaddkill()
+	if !GetConVar("boredhud_enable_killfeed"):GetBool() then return end
+
+	local killer = net.ReadEntity()
+	local hesdead = net.ReadString()
+	local headshot = net.ReadBool()
+	local gun = net.ReadString()
+	local histeam = net.ReadUInt(8)
+	local suicide = net.ReadBool()
+	
+	local killtbl = {
+		time = CurTime() + 6,
+		killer = (killer:IsPlayer() and killer:Name() or language.GetPhrase(killer:GetClass())),
+		hesdead = language.GetPhrase(hesdead),
+		wekilledhim = killer == LocalPlayer(),
+		killercolor = killer == LocalPlayer() and BoHU_ColorWhite or (killer:IsPlayer() and team.GetColor(killer:Team()) or npcenemycolor),
+		enemycolor = histeam == 255 and npcenemycolor or team.GetColor(histeam),
+		headshot = headshot,
+		gun = gun == "" and (IsValid(killer:GetActiveWeapon()) and (killer:GetActiveWeapon().PrintName and killer:GetActiveWeapon().PrintName or killer:GetActiveWeapon():GetClass())) or gun
+	}
+
+	if suicide then killtbl.gun = "SUICIDE" end
+	if killtbl.gun == "" then killtbl.gun = "???" end
+
+	if GetConVar("boredhud_deady"):GetFloat() < 0 then -- invert order if inverted hud placement
+		table.insert(bhkillfeed, 1, killtbl)
+	else
+		table.insert(bhkillfeed, killtbl)
+	end
+end
+
+hook.Add("DrawDeathNotice", "BoHU_DrawDeathNotice", function(x, y)
+	if GetConVar("boredhud_enable_killfeed"):GetBool() then return false end
+end)
+
+net.Receive("BoHU_KF_Kill", kfaddkill)
