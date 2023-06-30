@@ -105,6 +105,7 @@ local function generatefonts()
 			weight = GetConVar("boredhud_font_weight"):GetFloat(),
 			scanlines = GetConVar("boredhud_font_scanlines"):GetFloat(),
 			antialias = true,
+			extended = true,
 		} )
 	end
 
@@ -1262,7 +1263,7 @@ local function kfaddkill()
 	local gun = net.ReadString()
 	local histeam = net.ReadUInt(8)
 	local suicide = net.ReadBool()
-	
+
 	local killtbl = {
 		time = CurTime() + 6,
 		killer = (killer:IsPlayer() and killer:Name() or language.GetPhrase(killer:GetClass())),
@@ -1271,7 +1272,7 @@ local function kfaddkill()
 		killercolor = killer == LocalPlayer() and BoHU_ColorWhite or (killer:IsPlayer() and team.GetColor(killer:Team()) or npcenemycolor),
 		enemycolor = histeam == 255 and npcenemycolor or team.GetColor(histeam),
 		headshot = headshot,
-		gun = gun == "" and (IsValid(killer:GetActiveWeapon()) and (killer:GetActiveWeapon().PrintName and killer:GetActiveWeapon().PrintName or killer:GetActiveWeapon():GetClass())) or gun
+		gun = gun == "" and (killer.GetActiveWeapon and IsValid(killer:GetActiveWeapon()) and (killer:GetActiveWeapon().PrintName and killer:GetActiveWeapon().PrintName or killer:GetActiveWeapon():GetClass())) or gun
 	}
 
 	if suicide then killtbl.gun = "SUICIDE" end
