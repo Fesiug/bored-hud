@@ -1164,7 +1164,11 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 
 	for k, v in pairs(bhkillfeed) do
 		local decay = math.max(0, (v.time - CurTime())) * 750
-		
+
+		if v.time - CurTime() >= 5.8 then -- fade in
+			decay = (1-(v.time - CurTime()-5.8)*5)*255
+		end
+
 		if decay <= 0 then -- removing old
 			table.remove(bhkillfeed, k)
 		end
@@ -1216,7 +1220,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 			BoHU.Text(texxt3, {1, 0}, hi.scrw_g + hi.scrw - sm(19), hi.scrh_g + sm(12.25) + k * sm(8.95))
 	
 			if v.wekilledhim or v.wearedead then
-				surface.SetDrawColor(BoHU_ColorWhite.r*0.75, BoHU_ColorWhite.g*0.75, BoHU_ColorWhite.b*0.75, math.min(60, decay))
+				surface.SetDrawColor(BoHU_ColorWhite.r * 0.75, BoHU_ColorWhite.g * 0.75, BoHU_ColorWhite.b * 0.75, math.min(60, decay))
 				if v.wearedead then surface.SetDrawColor(255, 0, 0, math.min(60, decay)) end
 				surface.DrawRect(hi.scrw_g + hi.scrw - sm(16)-ww1-ww2-ww3-ww4-sm(5.75), hi.scrh_g + sm(11) + k * sm(8.95), ww1+ww2+ww3+ww4+sm(5), sm(9))
 			end
