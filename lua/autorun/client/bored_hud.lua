@@ -1180,6 +1180,7 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 			end
 		end
 
+		surface.SetFont("BoHU_8")
 		local texxt1 = v.killer
 		local ww1 = surface.GetTextSize(texxt1)
 		local texxt2 = " [" .. language.GetPhrase(v.gun) .."] "
