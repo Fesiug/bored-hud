@@ -144,7 +144,7 @@ local bohuPanel = {
 	{ type = "b", text = "Killfeed on right", var = "boredhud_killfeed_invert", },
 	{ type = "f", text = "HUD Scale", var = "boredhud_scale", min = 0.5, max = 2.5 },
 	{ type = "f", text = "Deadzone X", var = "boredhud_deadx", min = 0.5, max = 1 },
-	{ type = "f", text = "Deadzone Y", var = "boredhud_deady", min = 0.5, max = 1 },
+	{ type = "f", text = "Deadzone Y", var = "boredhud_deady", min = -0.75, max = 1 },
 	{ type = "t", text = "HUD Font", var = "boredhud_font"  },
 	{ type = "i", text = "HUD Font Scanlines", var = "boredhud_font_scanlines", min = 0, max = 10 },
 	{ type = "i", text = "HUD Font Weight", var = "boredhud_font_weight", min = 0, max = 1000 },
@@ -1160,13 +1160,21 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 
 	if !GetConVar("boredhud_enable_killfeed"):GetBool() then return end
 
+	local invertedhud = GetConVar("boredhud_deady"):GetFloat() < 0
+
 	for k, v in pairs(bhkillfeed) do
 		local decay = math.max(0, (v.time - CurTime())) * 750
 		
-		if decay <= 0 then
-			table.remove(bhkillfeed, k) -- removing old stains
+		if decay <= 0 then -- removing old
+			table.remove(bhkillfeed, k)
 		end
 
+		if #bhkillfeed > 5 and !v.overflowed then -- overflow
+			if invertedhud and k == #bhkillfeed or !invertedhud and k == 1 then -- if inverted hud then delete last one else first one
+				v.time = math.min(v.time, CurTime() + 0.1)
+				v.overflowed = true
+			end
+		end
 
 		local texxt1 = v.killer
 		local ww1 = surface.GetTextSize(texxt1)
@@ -1188,21 +1196,33 @@ hook.Add( "HUDPaint", "BoHU_HUDShouldDraw", function()
 			surface.SetTextColor(v.enemycolor.r, v.enemycolor.g, v.enemycolor.b, decay)
 			BoHU.Text(texxt3, {0, 0}, hi.scrw_g + sm(19) + ww1 + ww2 + ww4, hi.scrh_g + sm(12.25) + k * sm(8.95))
 
+			if v.wekilledhim or v.wearedead then
+				surface.SetDrawColor(BoHU_ColorWhite.r * 0.75, BoHU_ColorWhite.g * 0.75, BoHU_ColorWhite.b * 0.75, math.min(60, decay))
+				if v.wearedead then surface.SetDrawColor(255, 0, 0, math.min(60, decay)) end
+				surface.DrawRect(hi.scrw_g + sm(16.5), hi.scrh_g + sm(11) + k * sm(8.95), ww1+ww2+ww3+ww4+sm(5), sm(9))
+			end
+
 			surface.SetDrawColor(BoHU_ColorWhite.r, BoHU_ColorWhite.g, BoHU_ColorWhite.b, decay)
-			BoHU.ProgressBar(0, 0, hi.scrw_g + sm(16), hi.scrh_g + sm(11) + k * sm(8.95), ww1+ww2+ww3+ww4+sm(5), sm(9))
+			BoHU.ProgressBar(0, 0, hi.scrw_g + sm(16.5), hi.scrh_g + sm(11) + k * sm(8.95), ww1+ww2+ww3+ww4+sm(5), sm(9))
 		else
 			surface.SetTextColor(v.killercolor.r, v.killercolor.g, v.killercolor.b, decay)
-			BoHU.Text(texxt1, {2, 0}, hi.scrw_g + sm(19), hi.scrh_g + sm(12.25) + k * sm(8.95))
+			BoHU.Text(texxt1, {1, 0}, hi.scrw_g + hi.scrw - sm(19) - ww3 - ww2 - ww4, hi.scrh_g + sm(12.25) + k * sm(8.95))
 			surface.SetTextColor(255, 255, 255, decay)
-			BoHU.Text(texxt2, {2, 0}, hi.scrw_g + sm(19) + ww1, hi.scrh_g + sm(12.25) + k * sm(8.95))
+			BoHU.Text(texxt2, {1, 0}, hi.scrw_g + hi.scrw - sm(19) - ww3 - ww4, hi.scrh_g + sm(12.25) + k * sm(8.95))
 			surface.SetFont("BoHU_kf_cssfont")
-			BoHU.Text(texxt4, {2, 0}, hi.scrw_g + sm(16) + ww1 + ww2, hi.scrh_g + sm(12.5) + k * sm(8.95))
+			BoHU.Text(texxt4, {1, 0}, hi.scrw_g + hi.scrw - sm(20) - ww3, hi.scrh_g + sm(12.5) + k * sm(8.95))
 			surface.SetFont("BoHU_8")
 			surface.SetTextColor(v.enemycolor.r, v.enemycolor.g, v.enemycolor.b, decay)
-			BoHU.Text(texxt3, {2, 0}, hi.scrw_g + sm(19) + ww1 + ww2 + ww4, hi.scrh_g + sm(12.25) + k * sm(8.95))
+			BoHU.Text(texxt3, {1, 0}, hi.scrw_g + hi.scrw - sm(19), hi.scrh_g + sm(12.25) + k * sm(8.95))
 	
+			if v.wekilledhim or v.wearedead then
+				surface.SetDrawColor(BoHU_ColorWhite.r*0.75, BoHU_ColorWhite.g*0.75, BoHU_ColorWhite.b*0.75, math.min(60, decay))
+				if v.wearedead then surface.SetDrawColor(255, 0, 0, math.min(60, decay)) end
+				surface.DrawRect(hi.scrw_g + hi.scrw - sm(16)-ww1-ww2-ww3-ww4-sm(5.75), hi.scrh_g + sm(11) + k * sm(8.95), ww1+ww2+ww3+ww4+sm(5), sm(9))
+			end
+
 			surface.SetDrawColor(BoHU_ColorWhite.r, BoHU_ColorWhite.g, BoHU_ColorWhite.b, decay)
-			BoHU.ProgressBar(0, 0, hi.scrw_g + sm(16), hi.scrh_g + sm(11) + k * sm(8.95), ww1+ww2+ww3+ww4+sm(5), sm(9))
+			BoHU.ProgressBar(0, 0, hi.scrw_g + hi.scrw - sm(16)-ww1-ww2-ww3-ww4-sm(5.75), hi.scrh_g + sm(11) + k * sm(8.95), ww1+ww2+ww3+ww4+sm(5), sm(9))
 		end
 	end
 end )
@@ -1251,6 +1271,7 @@ local function kfaddkill()
 
 	if suicide then killtbl.gun = "SUICIDE" end
 	if killtbl.gun == "" then killtbl.gun = "???" end
+	if LocalPlayer():Name() == hesdead then killtbl.wearedead = true end
 
 	if GetConVar("boredhud_deady"):GetFloat() < 0 then -- invert order if inverted hud placement
 		table.insert(bhkillfeed, 1, killtbl)
