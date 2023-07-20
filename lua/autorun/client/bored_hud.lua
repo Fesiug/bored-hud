@@ -1263,10 +1263,10 @@ local function kfaddkill()
 	local gun = net.ReadString()
 	local histeam = net.ReadUInt(8)
 	local suicide = net.ReadBool()
-
+	
 	local killtbl = {
 		time = CurTime() + 6,
-		killer = (killer:IsPlayer() and killer:Name() or language.GetPhrase(killer:GetClass())),
+		killer = IsValid(killer) and (killer:IsPlayer() and killer:Name() or language.GetPhrase(killer:GetClass())) or "???",
 		hesdead = language.GetPhrase(hesdead),
 		wekilledhim = killer == LocalPlayer(),
 		killercolor = killer == LocalPlayer() and BoHU_ColorWhite or (killer:IsPlayer() and team.GetColor(killer:Team()) or npcenemycolor),
