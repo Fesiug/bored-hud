@@ -1318,9 +1318,11 @@ function BoHU.Draw3D()
 	if !P:Alive() then return end
 
 	local camcontrol = angle_zero
-	if hi.pw.ARC9 then
-		camcontrol = hi.pw:GetCameraControl()
-		camcontrol.y = math.Clamp(camcontrol.y, -10, 10)
+	if IsValid(hi.pw) then
+		if hi.pw.ARC9 then
+			camcontrol = hi.pw:GetCameraControl()
+			camcontrol.y = math.Clamp(camcontrol.y, -10, 10)
+		end
 	end
 
     local anchorwidth = math.min(ScrW() / 2, ScrH() / 2)
