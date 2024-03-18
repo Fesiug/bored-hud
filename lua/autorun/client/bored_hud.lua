@@ -1320,8 +1320,11 @@ function BoHU.Draw3D()
 	local camcontrol = angle_zero
 	if IsValid(hi.pw) then
 		if hi.pw.ARC9 then
-			camcontrol = hi.pw:GetCameraControl()
-			camcontrol.y = math.Clamp(camcontrol.y, -10, 10)
+			local camcontroller = hi.pw:GetCameraControl()
+			if camcontroller then
+				camcontrol = camcontroller
+				camcontrol.y = math.Clamp(camcontrol.y, -10, 10)
+			end
 		end
 	end
 
